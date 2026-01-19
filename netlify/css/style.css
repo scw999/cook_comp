@@ -548,62 +548,160 @@ body {
     font-size: 5em;
 }
 
+/* 라운드 주제 배너 */
+.round-theme-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 107, 107, 0.2));
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 15px;
+    padding: 15px 25px;
+    margin: 15px auto;
+    max-width: 500px;
+}
+
+.round-theme-banner .theme-icon {
+    font-size: 2.5em;
+}
+
+.round-theme-banner .theme-info {
+    text-align: left;
+}
+
+.round-theme-banner .theme-name {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.round-theme-banner .theme-desc {
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+/* 심사 플레이어 이름 */
+.judging-player-name {
+    text-align: center;
+    font-size: 1.5em;
+    color: #4caf50;
+    margin-bottom: 20px;
+}
+
 .judges-panel {
     display: flex;
     justify-content: center;
-    gap: 50px;
-    margin: 40px 0;
+    align-items: flex-start;
+    gap: 30px;
+    margin: 30px 0;
 }
 
 .judge-card {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
-    padding: 30px;
-    width: 300px;
+    padding: 25px;
+    width: 260px;
+    text-align: center;
 }
 
 .judge-avatar {
-    font-size: 5em;
-    margin-bottom: 15px;
+    font-size: 4em;
+    margin-bottom: 10px;
 }
 
 .judge-name {
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #ffd700;
     margin-bottom: 5px;
 }
 
 .judge-type {
     color: #aaa;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
 }
 
 .judge-score {
-    font-size: 3em;
+    font-size: 2.5em;
     font-weight: bold;
-    margin: 20px 0;
+    margin: 15px 0;
+    color: #4caf50;
+}
+
+.judge-comment {
+    font-style: italic;
+    color: #ffd700;
+    margin-bottom: 15px;
+    font-size: 0.95em;
+    min-height: 40px;
 }
 
 .score-breakdown {
     text-align: left;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #aaa;
 }
 
 .score-breakdown div {
-    margin: 5px 0;
+    margin: 4px 0;
     display: flex;
     justify-content: space-between;
 }
 
-.final-score {
+/* 총점 컨테이너 - 가운데 배치 */
+.total-score-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 107, 107, 0.3));
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px 40px;
+    min-width: 200px;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.5); }
+}
+
+.total-score-label {
+    font-size: 1.2em;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.total-score-value {
     font-size: 4em;
     font-weight: bold;
     background: linear-gradient(45deg, #ffd700, #ff6b6b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin: 30px 0;
+}
+
+.bonus-info {
+    font-size: 0.9em;
+    color: #4caf50;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.bonus-info .theme-bonus {
+    color: #ffd700;
+}
+
+.bonus-info .deco-bonus {
+    color: #ff6b6b;
+}
+
+/* 레거시 final-score 숨김 */
+.final-score {
+    display: none;
 }
 
 /* Boss */
@@ -1386,7 +1484,24 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
     .main-title h1 { font-size: 2em; }
-    .judges-panel { flex-direction: column; align-items: center; }
+    .judges-panel {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    .judges-panel .total-score-container {
+        order: -1;
+        margin-bottom: 10px;
+        padding: 20px 30px;
+    }
+    .total-score-value { font-size: 3em; }
+    .judge-card { width: 90%; max-width: 300px; }
+    .round-theme-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px 15px;
+    }
+    .round-theme-banner .theme-info { text-align: center; }
     .plating-area { flex-direction: column; }
     .plate-canvas { min-height: 300px; }
     .caught-selection { grid-template-columns: repeat(2, 1fr); }
