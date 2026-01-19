@@ -30,7 +30,9 @@ let gameState = {
     cookingMiniGameType: null,
     miniGameData: {},
     // 플레이팅 메인 요리 위치
-    mainDishPosition: { x: 50, y: 50 }
+    mainDishPosition: { x: 50, y: 50 },
+    // 심사 화면 타이머 관리
+    judgingTimeouts: []
 };
 
 // 플레이어 클래스
