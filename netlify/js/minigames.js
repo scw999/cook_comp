@@ -9,7 +9,7 @@ function startIngredientMiniGame() {
 
         <div class="ingredient-catch-game" id="ingredient-catch-area">
             <div class="catch-score">잡은 재료: <span id="catch-count">0</span>/6</div>
-            <div class="catch-timer">남은 시간: <span id="catch-timer">15</span>초</div>
+            <div class="catch-timer">남은 시간: <span id="catch-timer">20</span>초</div>
             <div class="falling-area" id="falling-area"></div>
         </div>
 
@@ -21,7 +21,7 @@ function startIngredientMiniGame() {
     gameState.ingredientGameScore = 0;
 
     startFallingIngredients();
-    startIngredientTimer(15);
+    startIngredientTimer(20);  // 15초 -> 20초로 증가
 }
 
 function startFallingIngredients() {

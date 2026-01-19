@@ -126,7 +126,7 @@ function showIngredientSelection() {
 
     renderCaughtForSelection();
 
-    let timeLimit = gameState.bossActive && gameState.currentBoss?.skillEffect === 'time' ? 21 : 30;
+    let timeLimit = gameState.bossActive && gameState.currentBoss?.skillEffect === 'time' ? 35 : 45;  // 30초 -> 45초로 증가
     startTimer(timeLimit, () => {
         if (!gameState.selectedIngredients.main) autoSelectFromCaught();
         confirmIngredients();
@@ -171,6 +171,13 @@ function selectCaughtIngredient(id) {
 }
 
 function autoSelectFromCaught() {
+    // 잡은 재료가 부족할 경우 랜덤 재료로 채우기
+    const allIngredients = Object.values(SERVER_INGREDIENTS).flat();
+    while (gameState.caughtIngredients.length < 3) {
+        const randomIng = allIngredients[Math.floor(Math.random() * allIngredients.length)];
+        gameState.caughtIngredients.push(randomIng);
+    }
+
     gameState.selectedIngredients = {
         main: gameState.caughtIngredients[0],
         sub1: gameState.caughtIngredients[1],
@@ -288,7 +295,7 @@ function showPlatingPhase() {
     setupEnhancedPlating();
     gameState.decorations = [];
 
-    let timeLimit = gameState.bossActive && gameState.currentBoss?.skillEffect === 'time' ? 31 : 45;
+    let timeLimit = gameState.bossActive && gameState.currentBoss?.skillEffect === 'time' ? 45 : 60;  // 45초 -> 60초로 증가
     startTimer(timeLimit, confirmPlating);
 }
 
@@ -467,12 +474,20 @@ function showJudgingScreen() {
     const player = getCurrentPlayer();
     const slots = gameState.selectedIngredients;
 
+    // 재료가 없으면 자동 선택
+    if (!slots.main || !slots.sub1 || !slots.sub2) {
+        autoSelectFromCaught();
+    }
+
     // 플레이어 이름 표시
     document.getElementById('judging-player-name').textContent = `${player.name}의 요리`;
     document.getElementById('final-dish-emoji').textContent = slots.main?.icon || '🍽️';
 
-    // 시너지 계산
-    const synergy = calculateSynergy(slots.main.id, slots.sub1.id, slots.sub2.id);
+    // 시너지 계산 (안전하게)
+    const mainId = slots.main?.id || 'beef';
+    const sub1Id = slots.sub1?.id || 'potato';
+    const sub2Id = slots.sub2?.id || 'onion';
+    const synergy = calculateSynergy(mainId, sub1Id, sub2Id);
 
     // 플레이팅 점수 계산 (장식 반영 강화)
     const decoCount = gameState.decorations.length;
@@ -480,13 +495,15 @@ function showJudgingScreen() {
     const decoBonus = Math.min(40, decoCount * 8);  // 장식당 8점, 최대 40점
     const platingHarmony = platingBase + decoBonus;
 
+    // 안전한 ID 배열 (위에서 정의한 안전한 ID 사용)
+    const selectedIds = [mainId, sub1Id, sub2Id];
+
     // 플레이팅 테마 매칭 점수 (강화)
     let themeMatch = 30;
     let themeBonus = 0;
     if (gameState.selectedTheme) {
         const theme = SERVER_THEMES.find(t => t.id === gameState.selectedTheme);
         if (theme) {
-            const selectedIds = [slots.main.id, slots.sub1.id, slots.sub2.id];
             const matches = selectedIds.filter(id => theme.matchIngredients.includes(id)).length;
             themeMatch = 30 + matches * 20;  // 재료 매칭당 20점
             themeBonus = matches * 20;
@@ -498,7 +515,6 @@ function showJudgingScreen() {
     let roundThemeBonus = 0;
     let roundThemeMatches = 0;
     if (roundTheme) {
-        const selectedIds = [slots.main.id, slots.sub1.id, slots.sub2.id];
         roundThemeMatches = selectedIds.filter(id => roundTheme.matchIngredients.includes(id)).length;
         roundThemeBonus = roundThemeMatches * 15;  // 라운드 주제 재료 매칭당 15점
     }
