@@ -62,6 +62,7 @@ function resetGameState() {
 
 // 턴 상태 초기화
 function resetTurnState() {
+    gameState.phase = 1;  // 페이즈를 1로 초기화
     gameState.selectedIngredients = { main: null, sub1: null, sub2: null };
     gameState.cookingScore = 0;
     gameState.selectedTheme = null;
@@ -72,6 +73,7 @@ function resetTurnState() {
     gameState.currentBoss = null;
     gameState.ingredientGameScore = 0;
     gameState.caughtIngredients = [];
+    gameState.ingredientGameActive = false;  // 재료 미니게임 상태 초기화
     gameState.mainDishPosition = { x: 50, y: 50 };
     gameState.isGaugeRunning = false;
     gameState.cookingMiniGameType = null;

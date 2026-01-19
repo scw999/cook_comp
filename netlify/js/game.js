@@ -49,6 +49,9 @@ function startRound() {
 }
 
 function startPlayerTurn() {
+    // 게임 화면으로 전환 (심사 화면에서 돌아올 때 필요)
+    showScreen('game-screen');
+
     const player = getCurrentPlayer();
     document.getElementById('current-player-display').textContent = `${player.name}의 차례`;
 
