@@ -1,1 +1,1959 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Wars: Steps of Taste</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Main Menu Styles */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-title {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .main-title h1 {
+            font-size: 3.5em;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .main-title h2 {
+            font-size: 1.5em;
+            color: #aaa;
+            font-weight: normal;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ffd700);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid #ffd700;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Player Setup */
+        .player-setup {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .player-count-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .player-count-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 2em;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #ffd700;
+            color: #ffd700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .player-count-btn:hover, .player-count-btn.selected {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        .player-names {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .player-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-input input {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 200px;
+        }
+
+        .player-input label {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Game Board */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .round-info {
+            font-size: 1.3em;
+        }
+
+        .current-player {
+            color: #ffd700;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .timer {
+            font-size: 2em;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .phase {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 0.9em;
+        }
+
+        .phase.active {
+            background: linear-gradient(45deg, #ff6b6b, #ffd700);
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+
+        .phase.completed {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        /* Ingredient Selection */
+        .ingredient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .ingredient-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .ingredient-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+        }
+
+        .ingredient-card.selected {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .ingredient-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .ingredient-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .ingredient-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .ingredient-stats {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .synergy-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .synergy-score {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .synergy-positive {
+            color: #4caf50;
+        }
+
+        .synergy-negative {
+            color: #ff6b6b;
+        }
+
+        .synergy-neutral {
+            color: #ffd700;
+        }
+
+        .selected-ingredients {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .selected-slot {
+            width: 120px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed #ffd700;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .selected-slot.filled {
+            border-style: solid;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Cooking Mini-game */
+        .cooking-game {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .cooking-animation {
+            font-size: 8em;
+            margin: 30px 0;
+            animation: cookBounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes cookBounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .gauge-container {
+            width: 100%;
+            max-width: 600px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            margin: 30px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gauge-target {
+            position: absolute;
+            height: 100%;
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 30px;
+        }
+
+        .gauge-indicator {
+            position: absolute;
+            width: 10px;
+            height: 100%;
+            background: #fff;
+            border-radius: 5px;
+            transition: left 0.05s linear;
+        }
+
+        .cooking-instructions {
+            font-size: 1.3em;
+            margin: 20px 0;
+            color: #ffd700;
+        }
+
+        .cooking-score {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+
+        .combo-display {
+            font-size: 1.5em;
+            color: #ff6b6b;
+        }
+
+        /* Plating Phase */
+        .plating-area {
+            display: flex;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .plate-canvas {
+            flex: 2;
+            min-height: 400px;
+            background: linear-gradient(145deg, #2a2a4a, #1a1a3a);
+            border-radius: 50%;
+            border: 5px solid #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .plate-decoration {
+            position: absolute;
+            font-size: 3em;
+            cursor: move;
+            user-select: none;
+        }
+
+        .theme-selector {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .theme-option {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .theme-option:hover {
+            border-color: #ffd700;
+        }
+
+        .theme-option.selected {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .decoration-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .decoration-item {
+            font-size: 2em;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .decoration-item:hover {
+            transform: scale(1.2);
+        }
+
+        /* Judging */
+        .judging-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .judges-panel {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin: 40px 0;
+        }
+
+        .judge-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 300px;
+        }
+
+        .judge-avatar {
+            font-size: 5em;
+            margin-bottom: 15px;
+        }
+
+        .judge-name {
+            font-size: 1.3em;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .judge-score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score-breakdown {
+            text-align: left;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .score-breakdown div {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .final-score {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 30px 0;
+        }
+
+        /* Boss Battle */
+        .boss-intro {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .boss-portrait {
+            font-size: 10em;
+            margin: 30px 0;
+            animation: bossAppear 1s ease;
+        }
+
+        @keyframes bossAppear {
+            from { transform: scale(0) rotate(-180deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .boss-name {
+            font-size: 2.5em;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .boss-title {
+            font-size: 1.3em;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .boss-skill {
+            background: rgba(255, 107, 107, 0.2);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+        }
+
+        .boss-skill h4 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .scoreboard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scoreboard-row:last-child {
+            border-bottom: none;
+        }
+
+        .scoreboard-row.current {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .player-rank {
+            font-size: 1.5em;
+            width: 50px;
+            color: #ffd700;
+        }
+
+        .player-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .player-fame {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .player-tier {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .tier-underdog { background: #607d8b; }
+        .tier-challenger { background: #9c27b0; }
+        .tier-artisan { background: #2196f3; }
+        .tier-master { background: #ff9800; }
+        .tier-royal { background: linear-gradient(45deg, #ffd700, #ff6b6b); }
+
+        /* Random Event */
+        .event-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, #2a2a4a, #1a1a3a);
+            border: 3px solid #ff6b6b;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            z-index: 1000;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .event-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .event-title {
+            font-size: 1.5em;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        /* Victory Screen */
+        .victory-screen {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .trophy {
+            font-size: 10em;
+            animation: trophyShine 2s ease infinite;
+        }
+
+        @keyframes trophyShine {
+            0%, 100% { filter: drop-shadow(0 0 20px #ffd700); }
+            50% { filter: drop-shadow(0 0 40px #ffd700); }
+        }
+
+        .winner-name {
+            font-size: 3em;
+            color: #ffd700;
+            margin: 30px 0;
+        }
+
+        /* Recipe Cards */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .recipe-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+        }
+
+        .recipe-card.selected {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .recipe-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .recipe-difficulty {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 10px;
+        }
+
+        .difficulty-star {
+            color: #ffd700;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.3s ease;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-tab:hover, .category-tab.active {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title h1 {
+                font-size: 2em;
+            }
+
+            .judges-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .plating-area {
+                flex-direction: column;
+            }
+
+            .plate-canvas {
+                min-height: 300px;
+            }
+        }
+
+        /* Additional Animations */
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .pulse {
+            animation: pulse 1s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Menu Screen -->
+        <div id="main-menu" class="screen active">
+            <div class="main-title">
+                <h1>GOURMET WARS</h1>
+                <h2>Steps of Taste</h2>
+            </div>
+            <div class="menu-buttons">
+                <button class="btn btn-primary" onclick="showScreen('player-setup')">NEW GAME</button>
+                <button class="btn btn-secondary" onclick="showScreen('how-to-play')">HOW TO PLAY</button>
+            </div>
+        </div>
+
+        <!-- How to Play Screen -->
+        <div id="how-to-play" class="screen">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">How to Play</h2>
+            <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+                <h3 style="color: #ff6b6b; margin: 20px 0 10px;">Game Overview</h3>
+                <p>Compete against other players in cooking competitions to become the ultimate Gourmet Master!</p>
+
+                <h3 style="color: #ff6b6b; margin: 20px 0 10px;">Three Phases per Round</h3>
+                <p><strong>1. Ingredient Collection:</strong> Select ingredients within the time limit. Watch for synergy bonuses!</p>
+                <p><strong>2. Cooking:</strong> Complete the mini-game by pressing SPACE at the right timing.</p>
+                <p><strong>3. Plating:</strong> Choose a theme and decorate your dish for bonus points.</p>
+
+                <h3 style="color: #ff6b6b; margin: 20px 0 10px;">Scoring</h3>
+                <p>Two judges evaluate your dish:</p>
+                <p><strong>Judge A (Analyst):</strong> Focuses on cooking technique and ingredient synergy</p>
+                <p><strong>Judge B (Gourmet):</strong> Values plating, theme, and presentation</p>
+
+                <h3 style="color: #ff6b6b; margin: 20px 0 10px;">Boss Battles</h3>
+                <p>Defeat three legendary chefs to claim the title of Gourmet Master!</p>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="btn btn-secondary" onclick="showScreen('main-menu')">BACK</button>
+            </div>
+        </div>
+
+        <!-- Player Setup Screen -->
+        <div id="player-setup" class="screen">
+            <div class="player-setup">
+                <h2 style="color: #ffd700; margin-bottom: 20px;">Select Players</h2>
+                <div class="player-count-selector">
+                    <button class="player-count-btn" onclick="setPlayerCount(2)">2</button>
+                    <button class="player-count-btn" onclick="setPlayerCount(3)">3</button>
+                    <button class="player-count-btn" onclick="setPlayerCount(4)">4</button>
+                </div>
+                <div id="player-names" class="player-names"></div>
+                <button class="btn btn-primary" onclick="startGame()" style="margin-top: 30px;">START GAME</button>
+                <button class="btn btn-secondary" onclick="showScreen('main-menu')" style="margin-top: 15px;">BACK</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="round-info">Round <span id="current-round">1</span> / <span id="total-rounds">5</span></div>
+                <div class="current-player" id="current-player-display">Player 1's Turn</div>
+                <div class="timer" id="timer">60</div>
+            </div>
+
+            <div class="phase-indicator">
+                <div class="phase" id="phase-1">1. Ingredients</div>
+                <div class="phase" id="phase-2">2. Cooking</div>
+                <div class="phase" id="phase-3">3. Plating</div>
+            </div>
+
+            <!-- Phase 1: Ingredient Selection -->
+            <div id="ingredient-phase" class="game-phase">
+                <h3 style="text-align: center; margin-bottom: 10px;">Select Your Ingredients</h3>
+                <p style="text-align: center; color: #aaa; margin-bottom: 20px;">Choose 1 main ingredient and 2 sub ingredients</p>
+
+                <div class="selected-ingredients">
+                    <div class="selected-slot" id="main-slot">
+                        <span style="font-size: 2em;">?</span>
+                        <span>Main Ingredient</span>
+                    </div>
+                    <div class="selected-slot" id="sub-slot-1">
+                        <span style="font-size: 2em;">?</span>
+                        <span>Sub Ingredient 1</span>
+                    </div>
+                    <div class="selected-slot" id="sub-slot-2">
+                        <span style="font-size: 2em;">?</span>
+                        <span>Sub Ingredient 2</span>
+                    </div>
+                </div>
+
+                <div class="synergy-display">
+                    <div>Current Synergy</div>
+                    <div class="synergy-score synergy-neutral" id="synergy-score">0</div>
+                    <div id="synergy-message" style="color: #aaa; margin-top: 10px;"></div>
+                </div>
+
+                <div class="category-tabs" id="category-tabs"></div>
+                <div class="ingredient-grid" id="ingredient-grid"></div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-primary" id="confirm-ingredients" onclick="confirmIngredients()" disabled>Confirm Selection</button>
+                </div>
+            </div>
+
+            <!-- Phase 2: Cooking -->
+            <div id="cooking-phase" class="game-phase" style="display: none;">
+                <div class="cooking-game">
+                    <h3>Cooking Time!</h3>
+                    <div class="cooking-animation" id="cooking-emoji">🍳</div>
+                    <div class="cooking-instructions" id="cooking-instruction">Press SPACE when the indicator is in the green zone!</div>
+
+                    <div class="gauge-container">
+                        <div class="gauge-target" id="gauge-target"></div>
+                        <div class="gauge-indicator" id="gauge-indicator"></div>
+                    </div>
+
+                    <div class="cooking-score">Score: <span id="cooking-score">0</span></div>
+                    <div class="combo-display">Combo: <span id="combo-count">0</span>x</div>
+                    <div style="margin-top: 20px;">
+                        <span id="cooking-attempts">Attempts: 0/5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3: Plating -->
+            <div id="plating-phase" class="game-phase" style="display: none;">
+                <h3 style="text-align: center; margin-bottom: 20px;">Plating & Presentation</h3>
+
+                <div class="plating-area">
+                    <div class="plate-canvas" id="plate-canvas">
+                        <span style="color: #555; font-size: 1.2em;">Your Dish</span>
+                    </div>
+
+                    <div class="theme-selector">
+                        <h4 style="color: #ffd700; margin-bottom: 15px;">Select Theme</h4>
+                        <div id="theme-options"></div>
+
+                        <h4 style="color: #ffd700; margin: 20px 0 15px;">Decorations</h4>
+                        <div class="decoration-palette" id="decoration-palette"></div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="confirmPlating()">Complete Dish</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Judging Screen -->
+        <div id="judging-screen" class="screen">
+            <div class="judging-screen">
+                <h2 style="color: #ffd700; margin-bottom: 20px;">Judging Time!</h2>
+                <div id="dish-presentation" style="text-align: center; margin: 20px 0;">
+                    <span style="font-size: 5em;" id="final-dish-emoji">🍽️</span>
+                </div>
+
+                <div class="judges-panel">
+                    <div class="judge-card">
+                        <div class="judge-avatar">🧐</div>
+                        <div class="judge-name">Judge A</div>
+                        <div style="color: #aaa;">The Cold Analyst</div>
+                        <div class="judge-score" id="judge-a-score">--</div>
+                        <div class="score-breakdown" id="judge-a-breakdown"></div>
+                    </div>
+
+                    <div class="judge-card">
+                        <div class="judge-avatar">😋</div>
+                        <div class="judge-name">Judge B</div>
+                        <div style="color: #aaa;">The Emotional Gourmet</div>
+                        <div class="judge-score" id="judge-b-score">--</div>
+                        <div class="score-breakdown" id="judge-b-breakdown"></div>
+                    </div>
+                </div>
+
+                <div class="final-score">Total: <span id="total-score">--</span></div>
+
+                <button class="btn btn-primary" id="next-turn-btn" onclick="nextTurn()">Next</button>
+            </div>
+        </div>
+
+        <!-- Boss Battle Screen -->
+        <div id="boss-screen" class="screen">
+            <div class="boss-intro">
+                <h2 style="color: #ff6b6b;">BOSS BATTLE!</h2>
+                <div class="boss-portrait" id="boss-portrait">👨‍🍳</div>
+                <div class="boss-name" id="boss-name">Boss Name</div>
+                <div class="boss-title" id="boss-title">Boss Title</div>
+                <p id="boss-description" style="max-width: 600px; margin: 0 auto 20px; color: #aaa;"></p>
+                <div class="boss-skill">
+                    <h4>Boss Skill: <span id="boss-skill-name"></span></h4>
+                    <p id="boss-skill-desc"></p>
+                </div>
+                <button class="btn btn-primary" onclick="startBossBattle()" style="margin-top: 30px;">Challenge!</button>
+            </div>
+        </div>
+
+        <!-- Round Results Screen -->
+        <div id="round-results" class="screen">
+            <h2 style="text-align: center; color: #ffd700; margin-bottom: 30px;">Round Results</h2>
+            <div class="scoreboard" id="round-scoreboard"></div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="nextRound()">Next Round</button>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen">
+            <div class="victory-screen">
+                <div class="trophy">🏆</div>
+                <h2 style="color: #ff6b6b;">VICTORY!</h2>
+                <div class="winner-name" id="winner-name">Player 1</div>
+                <p style="font-size: 1.3em; color: #aaa;">is the new Gourmet Master!</p>
+                <div id="final-standings" class="scoreboard" style="max-width: 500px; margin: 30px auto;"></div>
+                <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 30px;">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Popup (hidden by default) -->
+    <div id="event-overlay" class="overlay" style="display: none;"></div>
+    <div id="event-popup" class="event-popup" style="display: none;">
+        <div class="event-icon" id="event-icon">⚡</div>
+        <div class="event-title" id="event-title">Random Event!</div>
+        <p id="event-description">Something unexpected happened!</p>
+        <button class="btn btn-secondary" onclick="closeEvent()" style="margin-top: 20px;">Continue</button>
+    </div>
+
+    <script>
+        // ==================== GAME DATA ====================
+
+        const INGREDIENTS = {
+            meat: [
+                { id: 'pork', name: '돼지고기', nameEn: 'Pork', icon: '🥩', taste: 75, attribute: 'savory' },
+                { id: 'beef', name: '소고기', nameEn: 'Beef', icon: '🥓', taste: 85, attribute: 'rich' },
+                { id: 'chicken', name: '닭고기', nameEn: 'Chicken', icon: '🍗', taste: 70, attribute: 'light' },
+                { id: 'eel', name: '장어', nameEn: 'Eel', icon: '🐟', taste: 80, attribute: 'rich' },
+                { id: 'shrimp', name: '새우', nameEn: 'Shrimp', icon: '🦐', taste: 75, attribute: 'sweet' }
+            ],
+            seafood: [
+                { id: 'oyster', name: '굴', nameEn: 'Oyster', icon: '🦪', taste: 80, attribute: 'briny' },
+                { id: 'salmon', name: '연어', nameEn: 'Salmon', icon: '🍣', taste: 85, attribute: 'rich' },
+                { id: 'squid', name: '오징어', nameEn: 'Squid', icon: '🦑', taste: 70, attribute: 'chewy' },
+                { id: 'crab', name: '게', nameEn: 'Crab', icon: '🦀', taste: 90, attribute: 'sweet' }
+            ],
+            vegetable: [
+                { id: 'tomato', name: '토마토', nameEn: 'Tomato', icon: '🍅', taste: 65, attribute: 'acidic' },
+                { id: 'spinach', name: '시금치', nameEn: 'Spinach', icon: '🥬', taste: 50, attribute: 'earthy' },
+                { id: 'potato', name: '감자', nameEn: 'Potato', icon: '🥔', taste: 55, attribute: 'starchy' },
+                { id: 'cucumber', name: '오이', nameEn: 'Cucumber', icon: '🥒', taste: 45, attribute: 'fresh' },
+                { id: 'radish', name: '무', nameEn: 'Radish', icon: '🌰', taste: 50, attribute: 'pungent' },
+                { id: 'greenonion', name: '파', nameEn: 'Green Onion', icon: '🧅', taste: 40, attribute: 'pungent' },
+                { id: 'seaweed', name: '미역', nameEn: 'Seaweed', icon: '🌿', taste: 55, attribute: 'briny' }
+            ],
+            dairy: [
+                { id: 'cheese', name: '치즈', nameEn: 'Cheese', icon: '🧀', taste: 75, attribute: 'creamy' },
+                { id: 'butter', name: '버터', nameEn: 'Butter', icon: '🧈', taste: 70, attribute: 'rich' },
+                { id: 'cream', name: '크림', nameEn: 'Cream', icon: '🥛', taste: 65, attribute: 'creamy' }
+            ],
+            fruit: [
+                { id: 'lemon', name: '레몬', nameEn: 'Lemon', icon: '🍋', taste: 60, attribute: 'acidic' },
+                { id: 'pear', name: '배', nameEn: 'Pear', icon: '🍐', taste: 70, attribute: 'sweet' },
+                { id: 'peach', name: '복숭아', nameEn: 'Peach', icon: '🍑', taste: 75, attribute: 'sweet' },
+                { id: 'apple', name: '사과', nameEn: 'Apple', icon: '🍎', taste: 70, attribute: 'sweet' }
+            ],
+            condiment: [
+                { id: 'shrimpPaste', name: '새우젓', nameEn: 'Shrimp Paste', icon: '🫙', taste: 85, attribute: 'umami' },
+                { id: 'soySauce', name: '간장', nameEn: 'Soy Sauce', icon: '🍶', taste: 80, attribute: 'umami' },
+                { id: 'oliveoil', name: '올리브유', nameEn: 'Olive Oil', icon: '🫒', taste: 65, attribute: 'fruity' },
+                { id: 'basil', name: '바질', nameEn: 'Basil', icon: '🌱', taste: 60, attribute: 'aromatic' },
+                { id: 'tofu', name: '두부', nameEn: 'Tofu', icon: '🧊', taste: 45, attribute: 'mild' }
+            ],
+            fermented: [
+                { id: 'kimchi', name: '김치', nameEn: 'Kimchi', icon: '🥗', taste: 80, attribute: 'fermented' },
+                { id: 'miso', name: '된장', nameEn: 'Miso', icon: '🥣', taste: 85, attribute: 'fermented' },
+                { id: 'gochujang', name: '고추장', nameEn: 'Gochujang', icon: '🌶️', taste: 80, attribute: 'spicy' }
+            ]
+        };
+
+        // Synergy rules based on the game design document
+        const SYNERGY_RULES = [
+            // Positive synergies
+            { ingredients: ['pork', 'shrimpPaste'], bonus: 20, message: '프로테아제가 소화를 돕고 감칠맛 증폭!' },
+            { ingredients: ['tomato', 'basil', 'oliveoil'], bonus: 25, message: '지용성 비타민 흡수와 향미의 균형!' },
+            { ingredients: ['tomato', 'basil'], bonus: 15, message: '클래식한 이탈리안 조합!' },
+            { ingredients: ['tomato', 'oliveoil'], bonus: 10, message: '지용성 비타민 흡수 증가!' },
+            { ingredients: ['beef', 'pear'], bonus: 15, message: '배의 연육 효소가 고기를 부드럽게!' },
+            { ingredients: ['oyster', 'lemon'], bonus: 20, message: '비타민 C가 철분 흡수를 돕고 비린내 제거!' },
+            { ingredients: ['potato', 'cheese'], bonus: 15, message: '비타민과 단백질, 칼슘의 완벽한 조화!' },
+            { ingredients: ['chicken', 'lemon'], bonus: 10, message: '상큼한 레몬이 닭고기의 풍미를 살림!' },
+            { ingredients: ['salmon', 'cream'], bonus: 15, message: '크리미한 소스와 연어의 환상 조합!' },
+            { ingredients: ['shrimp', 'butter'], bonus: 12, message: '버터 쉬림프의 고소한 맛!' },
+            { ingredients: ['beef', 'soySauce'], bonus: 10, message: '간장이 소고기의 감칠맛을 증폭!' },
+            { ingredients: ['pork', 'kimchi'], bonus: 18, message: '김치찌개의 깊은 맛!' },
+            { ingredients: ['tofu', 'miso'], bonus: 12, message: '일본 전통의 맛!' },
+            { ingredients: ['crab', 'butter'], bonus: 15, message: '버터 크랩의 진한 풍미!' },
+
+            // Negative synergies
+            { ingredients: ['seaweed', 'greenonion'], bonus: -15, message: '파가 미역의 칼슘 흡수를 방해!' },
+            { ingredients: ['spinach', 'tofu'], bonus: -20, message: '시금치의 옥살산이 두부의 칼슘과 결합!' },
+            { ingredients: ['cucumber', 'radish'], bonus: -10, message: '오이의 효소가 무의 비타민 C를 파괴!' },
+            { ingredients: ['eel', 'peach'], bonus: -25, message: '복숭아의 유기산이 장어의 소화를 방해!' }
+        ];
+
+        const THEMES = [
+            { id: 'memory', name: '추억', nameEn: 'Memory', icon: '📸', matchIngredients: ['kimchi', 'miso', 'pork', 'beef'] },
+            { id: 'challenge', name: '도전', nameEn: 'Challenge', icon: '🔥', matchIngredients: ['gochujang', 'eel', 'crab'] },
+            { id: 'sea', name: '바다', nameEn: 'Ocean', icon: '🌊', matchIngredients: ['oyster', 'salmon', 'seaweed', 'shrimp', 'crab', 'squid'] },
+            { id: 'garden', name: '정원', nameEn: 'Garden', icon: '🌸', matchIngredients: ['tomato', 'basil', 'spinach', 'cucumber'] },
+            { id: 'comfort', name: '따뜻함', nameEn: 'Comfort', icon: '🏠', matchIngredients: ['potato', 'cheese', 'butter', 'cream'] },
+            { id: 'elegance', name: '우아함', nameEn: 'Elegance', icon: '✨', matchIngredients: ['salmon', 'oyster', 'cream', 'lemon'] }
+        ];
+
+        const DECORATIONS = ['🌿', '🌸', '🍃', '🌺', '💫', '✨', '🔥', '❄️', '🌙', '⭐', '🎨', '💎'];
+
+        const BOSSES = [
+            {
+                id: 'kangchulsoo',
+                name: '강철수',
+                title: '발효의 마스터, 종갓집 장손',
+                icon: '👴',
+                description: '정통 한식을 고수하며 장류와 발효 음식을 주무기로 사용합니다.',
+                skillName: '간섭',
+                skillDesc: '플레이어가 선택한 재료 중 하나를 강제로 하급 재료로 교체합니다.',
+                skillEffect: 'downgrade',
+                fame_required: 100
+            },
+            {
+                id: 'edwardlian',
+                name: '에드워드 리안',
+                title: '분자 요리의 연금술사',
+                icon: '🧑‍🔬',
+                description: '요리를 과학으로 접근하며 분자 요리 기법을 사용합니다.',
+                skillName: '복잡성',
+                skillDesc: '조리 공정 난이도를 대폭 상승시키고 미니 게임 속도를 1.5배 빠르게 만듭니다.',
+                skillEffect: 'difficulty',
+                fame_required: 250
+            },
+            {
+                id: 'chefchen',
+                name: '마왕 첸',
+                title: '화염의 지배자',
+                icon: '👨‍🍳',
+                description: '중식을 기반으로 화력을 자유자재로 다루며 속도와 화려함을 중시합니다.',
+                skillName: '시간 압박',
+                skillDesc: '플레이어의 전체 조리 시간을 30% 단축시킵니다.',
+                skillEffect: 'time',
+                fame_required: 400
+            }
+        ];
+
+        const RANDOM_EVENTS = [
+            { id: 'fire', title: '불 조절 실패!', desc: '불이 너무 세져서 다시 조절해야 합니다.', effect: 'reduce_score', value: -10, icon: '🔥' },
+            { id: 'inspiration', title: '요리의 영감!', desc: '갑자기 좋은 아이디어가 떠올랐습니다!', effect: 'add_score', value: 15, icon: '💡' },
+            { id: 'drop', title: '재료 낙하!', desc: '재료를 떨어뜨렸습니다!', effect: 'reduce_score', value: -15, icon: '😱' },
+            { id: 'perfect', title: '퍼펙트 타이밍!', desc: '완벽한 타이밍으로 요리했습니다!', effect: 'add_score', value: 20, icon: '⭐' },
+            { id: 'judge', title: '심사위원 호감!', desc: '심사위원이 당신의 요리에 관심을 보입니다.', effect: 'judge_bonus', value: 10, icon: '😊' }
+        ];
+
+        const TIERS = [
+            { name: '언더독', nameEn: 'Underdog', fame: 0, class: 'tier-underdog' },
+            { name: '챌린저', nameEn: 'Challenger', fame: 100, class: 'tier-challenger' },
+            { name: '장인', nameEn: 'Artisan', fame: 250, class: 'tier-artisan' },
+            { name: '마스터', nameEn: 'Master', fame: 400, class: 'tier-master' },
+            { name: '로열 마스터', nameEn: 'Royal Master', fame: 600, class: 'tier-royal' }
+        ];
+
+        // ==================== GAME STATE ====================
+
+        let gameState = {
+            players: [],
+            currentPlayerIndex: 0,
+            currentRound: 1,
+            totalRounds: 5,
+            phase: 1,
+            selectedIngredients: { main: null, sub1: null, sub2: null },
+            cookingScore: 0,
+            platingScore: 0,
+            selectedTheme: null,
+            decorations: [],
+            timerInterval: null,
+            timeRemaining: 60,
+            cookingAttempts: 0,
+            maxCookingAttempts: 5,
+            comboCount: 0,
+            gaugeSpeed: 3,
+            gaugeDirection: 1,
+            gaugePosition: 0,
+            isGaugeRunning: false,
+            currentBoss: null,
+            bossActive: false,
+            defeatedBosses: []
+        };
+
+        // ==================== UTILITY FUNCTIONS ====================
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function setPlayerCount(count) {
+            document.querySelectorAll('.player-count-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+
+            const container = document.getElementById('player-names');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                container.innerHTML += `
+                    <div class="player-input">
+                        <label>Player ${i}</label>
+                        <input type="text" id="player-name-${i}" placeholder="Enter name" value="Player ${i}">
+                    </div>
+                `;
+            }
+        }
+
+        function startGame() {
+            const inputs = document.querySelectorAll('#player-names input');
+            if (inputs.length < 2) {
+                alert('Please select number of players first!');
+                return;
+            }
+
+            gameState.players = [];
+            inputs.forEach((input, index) => {
+                gameState.players.push({
+                    name: input.value || `Player ${index + 1}`,
+                    fame: 0,
+                    totalScore: 0,
+                    roundScores: []
+                });
+            });
+
+            gameState.currentRound = 1;
+            gameState.currentPlayerIndex = 0;
+            gameState.defeatedBosses = [];
+
+            document.getElementById('total-rounds').textContent = gameState.totalRounds;
+
+            startRound();
+        }
+
+        function startRound() {
+            showScreen('game-screen');
+            document.getElementById('current-round').textContent = gameState.currentRound;
+            startPlayerTurn();
+        }
+
+        function startPlayerTurn() {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            document.getElementById('current-player-display').textContent = `${player.name}'s Turn`;
+
+            // Reset phase states
+            gameState.phase = 1;
+            gameState.selectedIngredients = { main: null, sub1: null, sub2: null };
+            gameState.cookingScore = 0;
+            gameState.platingScore = 0;
+            gameState.selectedTheme = null;
+            gameState.decorations = [];
+            gameState.cookingAttempts = 0;
+            gameState.comboCount = 0;
+
+            // Check for boss battle
+            const nextBoss = BOSSES.find(b =>
+                player.fame >= b.fame_required &&
+                !gameState.defeatedBosses.includes(b.id)
+            );
+
+            if (nextBoss && !gameState.bossActive) {
+                showBossIntro(nextBoss);
+                return;
+            }
+
+            updatePhaseIndicator();
+            showIngredientPhase();
+        }
+
+        function updatePhaseIndicator() {
+            for (let i = 1; i <= 3; i++) {
+                const phase = document.getElementById(`phase-${i}`);
+                phase.classList.remove('active', 'completed');
+                if (i < gameState.phase) {
+                    phase.classList.add('completed');
+                } else if (i === gameState.phase) {
+                    phase.classList.add('active');
+                }
+            }
+        }
+
+        // ==================== PHASE 1: INGREDIENT SELECTION ====================
+
+        function showIngredientPhase() {
+            document.querySelectorAll('.game-phase').forEach(p => p.style.display = 'none');
+            document.getElementById('ingredient-phase').style.display = 'block';
+
+            renderCategoryTabs();
+            renderIngredients('meat');
+            updateSelectedSlots();
+            updateSynergyDisplay();
+
+            // Apply boss skill if active
+            let timeLimit = 60;
+            if (gameState.bossActive && gameState.currentBoss.skillEffect === 'time') {
+                timeLimit = Math.floor(timeLimit * 0.7);
+            }
+
+            startTimer(timeLimit, () => {
+                if (gameState.selectedIngredients.main) {
+                    confirmIngredients();
+                } else {
+                    // Auto-select random ingredients
+                    autoSelectIngredients();
+                    confirmIngredients();
+                }
+            });
+        }
+
+        function renderCategoryTabs() {
+            const container = document.getElementById('category-tabs');
+            const categories = Object.keys(INGREDIENTS);
+            const categoryNames = {
+                meat: '육류', seafood: '해산물', vegetable: '채소',
+                dairy: '유제품', fruit: '과일', condiment: '양념', fermented: '발효'
+            };
+
+            container.innerHTML = categories.map(cat =>
+                `<button class="category-tab ${cat === 'meat' ? 'active' : ''}" onclick="renderIngredients('${cat}')">${categoryNames[cat]}</button>`
+            ).join('');
+        }
+
+        function renderIngredients(category) {
+            document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+            event?.target?.classList.add('active');
+
+            const grid = document.getElementById('ingredient-grid');
+            const ingredients = INGREDIENTS[category];
+
+            grid.innerHTML = ingredients.map(ing => {
+                const isSelected = Object.values(gameState.selectedIngredients).some(s => s?.id === ing.id);
+                const isDisabled = checkBossDowngrade(ing);
+
+                return `
+                    <div class="ingredient-card ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}"
+                         onclick="selectIngredient('${ing.id}', '${category}')">
+                        <div class="ingredient-icon">${ing.icon}</div>
+                        <div class="ingredient-name">${ing.name}</div>
+                        <div class="ingredient-stats">맛: ${ing.taste} | ${ing.attribute}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkBossDowngrade(ingredient) {
+            if (gameState.bossActive && gameState.currentBoss.skillEffect === 'downgrade') {
+                // Boss downgrades high-taste ingredients
+                return ingredient.taste >= 80 && Math.random() < 0.3;
+            }
+            return false;
+        }
+
+        function selectIngredient(id, category) {
+            const ingredients = INGREDIENTS[category];
+            const ingredient = ingredients.find(i => i.id === id);
+
+            if (!ingredient || checkBossDowngrade(ingredient)) return;
+
+            // Check if already selected
+            const slots = gameState.selectedIngredients;
+            if (Object.values(slots).some(s => s?.id === id)) {
+                // Deselect
+                if (slots.main?.id === id) slots.main = null;
+                else if (slots.sub1?.id === id) slots.sub1 = null;
+                else if (slots.sub2?.id === id) slots.sub2 = null;
+            } else {
+                // Select into appropriate slot
+                if (!slots.main) {
+                    slots.main = ingredient;
+                } else if (!slots.sub1) {
+                    slots.sub1 = ingredient;
+                } else if (!slots.sub2) {
+                    slots.sub2 = ingredient;
+                }
+            }
+
+            renderIngredients(category);
+            updateSelectedSlots();
+            updateSynergyDisplay();
+
+            // Enable confirm button if all slots filled
+            const allFilled = slots.main && slots.sub1 && slots.sub2;
+            document.getElementById('confirm-ingredients').disabled = !allFilled;
+        }
+
+        function updateSelectedSlots() {
+            const slots = gameState.selectedIngredients;
+
+            ['main', 'sub1', 'sub2'].forEach((slotKey, index) => {
+                const slotId = index === 0 ? 'main-slot' : `sub-slot-${index}`;
+                const slot = document.getElementById(slotId);
+                const ingredient = slots[slotKey];
+
+                if (ingredient) {
+                    slot.innerHTML = `
+                        <span style="font-size: 2em;">${ingredient.icon}</span>
+                        <span>${ingredient.name}</span>
+                    `;
+                    slot.classList.add('filled');
+                } else {
+                    const labels = ['Main Ingredient', 'Sub Ingredient 1', 'Sub Ingredient 2'];
+                    slot.innerHTML = `
+                        <span style="font-size: 2em;">?</span>
+                        <span>${labels[index]}</span>
+                    `;
+                    slot.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateSynergyDisplay() {
+            const slots = gameState.selectedIngredients;
+            const selectedIds = [slots.main?.id, slots.sub1?.id, slots.sub2?.id].filter(Boolean);
+
+            let totalSynergy = 0;
+            let messages = [];
+
+            SYNERGY_RULES.forEach(rule => {
+                const matchCount = rule.ingredients.filter(ing => selectedIds.includes(ing)).length;
+                if (matchCount === rule.ingredients.length) {
+                    totalSynergy += rule.bonus;
+                    messages.push(rule.message);
+                }
+            });
+
+            const scoreEl = document.getElementById('synergy-score');
+            scoreEl.textContent = (totalSynergy >= 0 ? '+' : '') + totalSynergy;
+            scoreEl.className = 'synergy-score ' + (totalSynergy > 0 ? 'synergy-positive' : totalSynergy < 0 ? 'synergy-negative' : 'synergy-neutral');
+
+            document.getElementById('synergy-message').textContent = messages.join(' ');
+        }
+
+        function calculateSynergy() {
+            const slots = gameState.selectedIngredients;
+            const selectedIds = [slots.main?.id, slots.sub1?.id, slots.sub2?.id].filter(Boolean);
+
+            let totalSynergy = 50; // Base synergy
+
+            SYNERGY_RULES.forEach(rule => {
+                const matchCount = rule.ingredients.filter(ing => selectedIds.includes(ing)).length;
+                if (matchCount === rule.ingredients.length) {
+                    totalSynergy += rule.bonus;
+                }
+            });
+
+            return Math.max(0, Math.min(100, totalSynergy));
+        }
+
+        function autoSelectIngredients() {
+            const allIngredients = Object.values(INGREDIENTS).flat();
+            const shuffled = allIngredients.sort(() => Math.random() - 0.5);
+
+            gameState.selectedIngredients = {
+                main: shuffled[0],
+                sub1: shuffled[1],
+                sub2: shuffled[2]
+            };
+        }
+
+        function confirmIngredients() {
+            stopTimer();
+            gameState.phase = 2;
+            updatePhaseIndicator();
+            showCookingPhase();
+        }
+
+        // ==================== PHASE 2: COOKING MINI-GAME ====================
+
+        function showCookingPhase() {
+            document.querySelectorAll('.game-phase').forEach(p => p.style.display = 'none');
+            document.getElementById('cooking-phase').style.display = 'block';
+
+            gameState.cookingScore = 0;
+            gameState.cookingAttempts = 0;
+            gameState.comboCount = 0;
+
+            // Adjust difficulty for boss
+            gameState.gaugeSpeed = 3;
+            if (gameState.bossActive && gameState.currentBoss.skillEffect === 'difficulty') {
+                gameState.gaugeSpeed = 4.5;
+            }
+
+            document.getElementById('cooking-score').textContent = '0';
+            document.getElementById('combo-count').textContent = '0';
+            document.getElementById('cooking-attempts').textContent = `Attempts: 0/${gameState.maxCookingAttempts}`;
+
+            // Set random target zone
+            setNewTarget();
+            startGauge();
+
+            // Listen for spacebar
+            document.addEventListener('keydown', handleCookingInput);
+        }
+
+        function setNewTarget() {
+            const targetEl = document.getElementById('gauge-target');
+            const targetWidth = 15 + Math.random() * 10; // 15-25% width
+            const targetLeft = 10 + Math.random() * (75 - targetWidth); // Random position
+
+            targetEl.style.width = targetWidth + '%';
+            targetEl.style.left = targetLeft + '%';
+
+            gameState.targetZone = {
+                left: targetLeft,
+                right: targetLeft + targetWidth
+            };
+        }
+
+        function startGauge() {
+            gameState.gaugePosition = 0;
+            gameState.gaugeDirection = 1;
+            gameState.isGaugeRunning = true;
+
+            const indicator = document.getElementById('gauge-indicator');
+
+            function updateGauge() {
+                if (!gameState.isGaugeRunning) return;
+
+                gameState.gaugePosition += gameState.gaugeSpeed * gameState.gaugeDirection;
+
+                if (gameState.gaugePosition >= 100) {
+                    gameState.gaugePosition = 100;
+                    gameState.gaugeDirection = -1;
+                } else if (gameState.gaugePosition <= 0) {
+                    gameState.gaugePosition = 0;
+                    gameState.gaugeDirection = 1;
+                }
+
+                indicator.style.left = gameState.gaugePosition + '%';
+
+                requestAnimationFrame(updateGauge);
+            }
+
+            requestAnimationFrame(updateGauge);
+        }
+
+        function handleCookingInput(e) {
+            if (e.code === 'Space' && gameState.phase === 2 && gameState.isGaugeRunning) {
+                e.preventDefault();
+                checkCookingHit();
+            }
+        }
+
+        function checkCookingHit() {
+            gameState.cookingAttempts++;
+
+            const pos = gameState.gaugePosition;
+            const target = gameState.targetZone;
+
+            let points = 0;
+
+            if (pos >= target.left && pos <= target.right) {
+                // Calculate precision (center = 20 points, edge = 10 points)
+                const center = (target.left + target.right) / 2;
+                const distance = Math.abs(pos - center);
+                const maxDistance = (target.right - target.left) / 2;
+                const precision = 1 - (distance / maxDistance);
+
+                points = Math.floor(10 + precision * 10);
+                gameState.comboCount++;
+
+                // Combo bonus
+                if (gameState.comboCount >= 3) {
+                    points += gameState.comboCount * 2;
+                }
+
+                document.getElementById('cooking-emoji').textContent = '🔥';
+            } else {
+                gameState.comboCount = 0;
+                document.getElementById('cooking-emoji').textContent = '😅';
+                document.getElementById('cooking-emoji').classList.add('shake');
+                setTimeout(() => document.getElementById('cooking-emoji').classList.remove('shake'), 500);
+            }
+
+            gameState.cookingScore += points;
+            document.getElementById('cooking-score').textContent = gameState.cookingScore;
+            document.getElementById('combo-count').textContent = gameState.comboCount;
+            document.getElementById('cooking-attempts').textContent = `Attempts: ${gameState.cookingAttempts}/${gameState.maxCookingAttempts}`;
+
+            if (gameState.cookingAttempts >= gameState.maxCookingAttempts) {
+                endCookingPhase();
+            } else {
+                setNewTarget();
+            }
+        }
+
+        function endCookingPhase() {
+            gameState.isGaugeRunning = false;
+            document.removeEventListener('keydown', handleCookingInput);
+
+            // Random event chance
+            if (Math.random() < 0.3) {
+                triggerRandomEvent();
+            }
+
+            setTimeout(() => {
+                gameState.phase = 3;
+                updatePhaseIndicator();
+                showPlatingPhase();
+            }, 1000);
+        }
+
+        function triggerRandomEvent() {
+            const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+
+            document.getElementById('event-icon').textContent = event.icon;
+            document.getElementById('event-title').textContent = event.title;
+            document.getElementById('event-description').textContent = event.desc;
+
+            document.getElementById('event-overlay').style.display = 'block';
+            document.getElementById('event-popup').style.display = 'block';
+
+            // Apply effect
+            if (event.effect === 'add_score' || event.effect === 'reduce_score') {
+                gameState.cookingScore = Math.max(0, gameState.cookingScore + event.value);
+                document.getElementById('cooking-score').textContent = gameState.cookingScore;
+            } else if (event.effect === 'judge_bonus') {
+                gameState.judgeBonus = event.value;
+            }
+        }
+
+        function closeEvent() {
+            document.getElementById('event-overlay').style.display = 'none';
+            document.getElementById('event-popup').style.display = 'none';
+        }
+
+        // ==================== PHASE 3: PLATING ====================
+
+        function showPlatingPhase() {
+            document.querySelectorAll('.game-phase').forEach(p => p.style.display = 'none');
+            document.getElementById('plating-phase').style.display = 'block';
+
+            renderThemeOptions();
+            renderDecorationPalette();
+            setupPlateCanvas();
+
+            let timeLimit = 45;
+            if (gameState.bossActive && gameState.currentBoss.skillEffect === 'time') {
+                timeLimit = Math.floor(timeLimit * 0.7);
+            }
+
+            startTimer(timeLimit, confirmPlating);
+        }
+
+        function renderThemeOptions() {
+            const container = document.getElementById('theme-options');
+            container.innerHTML = THEMES.map(theme => `
+                <div class="theme-option" onclick="selectTheme('${theme.id}')">
+                    <span style="font-size: 1.5em;">${theme.icon}</span>
+                    <span style="margin-left: 10px;">${theme.name} (${theme.nameEn})</span>
+                </div>
+            `).join('');
+        }
+
+        function selectTheme(themeId) {
+            gameState.selectedTheme = THEMES.find(t => t.id === themeId);
+
+            document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+            event.target.closest('.theme-option').classList.add('selected');
+        }
+
+        function renderDecorationPalette() {
+            const container = document.getElementById('decoration-palette');
+            container.innerHTML = DECORATIONS.map(dec =>
+                `<div class="decoration-item" onclick="addDecoration('${dec}')">${dec}</div>`
+            ).join('');
+        }
+
+        function setupPlateCanvas() {
+            const canvas = document.getElementById('plate-canvas');
+            const mainIngredient = gameState.selectedIngredients.main;
+
+            canvas.innerHTML = `
+                <span style="font-size: 4em;">${mainIngredient?.icon || '🍽️'}</span>
+            `;
+            gameState.decorations = [];
+        }
+
+        function addDecoration(emoji) {
+            if (gameState.decorations.length >= 5) return;
+
+            const canvas = document.getElementById('plate-canvas');
+            const decoration = document.createElement('div');
+            decoration.className = 'plate-decoration';
+            decoration.textContent = emoji;
+            decoration.style.left = (20 + Math.random() * 60) + '%';
+            decoration.style.top = (20 + Math.random() * 60) + '%';
+
+            canvas.appendChild(decoration);
+            gameState.decorations.push(emoji);
+        }
+
+        function confirmPlating() {
+            stopTimer();
+            calculateFinalScore();
+        }
+
+        // ==================== SCORING ====================
+
+        function calculateFinalScore() {
+            const synergy = calculateSynergy();
+            const cookingScore = Math.min(100, gameState.cookingScore);
+
+            // Calculate plating harmony (based on decoration count)
+            const platingHarmony = Math.min(100, 50 + gameState.decorations.length * 10);
+
+            // Calculate theme match
+            let themeMatch = 50;
+            if (gameState.selectedTheme) {
+                const selectedIds = [
+                    gameState.selectedIngredients.main?.id,
+                    gameState.selectedIngredients.sub1?.id,
+                    gameState.selectedIngredients.sub2?.id
+                ].filter(Boolean);
+
+                const matches = selectedIds.filter(id =>
+                    gameState.selectedTheme.matchIngredients.includes(id)
+                ).length;
+
+                themeMatch = 50 + matches * 15;
+            }
+
+            // Judge A: Cold Analyst
+            // Score = (Cooking x 0.5) + (Synergy x 0.3) + (Event handling x 0.2)
+            const eventBonus = gameState.judgeBonus || 0;
+            const judgeAScore = Math.round(
+                (cookingScore * 0.5) +
+                (synergy * 0.3) +
+                ((cookingScore + eventBonus) * 0.2)
+            );
+
+            // Judge B: Emotional Gourmet
+            // Score = (Plating x 0.4) + (Theme x 0.4) + (Synergy x 0.2)
+            const judgeBScore = Math.round(
+                (platingHarmony * 0.4) +
+                (themeMatch * 0.4) +
+                (synergy * 0.2)
+            );
+
+            const totalScore = judgeAScore + judgeBScore;
+
+            // Boss battle comparison
+            if (gameState.bossActive) {
+                const bossScore = 120 + Math.floor(Math.random() * 30); // Boss scores 120-150
+                showJudgingScreen(judgeAScore, judgeBScore, totalScore, synergy, cookingScore, platingHarmony, themeMatch, bossScore);
+            } else {
+                showJudgingScreen(judgeAScore, judgeBScore, totalScore, synergy, cookingScore, platingHarmony, themeMatch);
+            }
+        }
+
+        function showJudgingScreen(judgeA, judgeB, total, synergy, cooking, plating, theme, bossScore = null) {
+            showScreen('judging-screen');
+
+            const mainIng = gameState.selectedIngredients.main;
+            document.getElementById('final-dish-emoji').textContent = mainIng?.icon || '🍽️';
+
+            // Animate scores
+            setTimeout(() => {
+                document.getElementById('judge-a-score').textContent = judgeA;
+                document.getElementById('judge-a-breakdown').innerHTML = `
+                    <div><span>Cooking:</span><span>${Math.round(cooking * 0.5)}</span></div>
+                    <div><span>Synergy:</span><span>${Math.round(synergy * 0.3)}</span></div>
+                    <div><span>Handling:</span><span>${Math.round(cooking * 0.2)}</span></div>
+                `;
+            }, 500);
+
+            setTimeout(() => {
+                document.getElementById('judge-b-score').textContent = judgeB;
+                document.getElementById('judge-b-breakdown').innerHTML = `
+                    <div><span>Plating:</span><span>${Math.round(plating * 0.4)}</span></div>
+                    <div><span>Theme:</span><span>${Math.round(theme * 0.4)}</span></div>
+                    <div><span>Synergy:</span><span>${Math.round(synergy * 0.2)}</span></div>
+                `;
+            }, 1000);
+
+            setTimeout(() => {
+                document.getElementById('total-score').textContent = total;
+
+                if (bossScore !== null) {
+                    const resultText = total > bossScore ?
+                        `You WIN! (Boss: ${bossScore})` :
+                        `You LOSE... (Boss: ${bossScore})`;
+                    document.getElementById('total-score').textContent = `${total} - ${resultText}`;
+
+                    if (total > bossScore) {
+                        gameState.defeatedBosses.push(gameState.currentBoss.id);
+                    }
+                }
+            }, 1500);
+
+            // Store score for current player
+            const player = gameState.players[gameState.currentPlayerIndex];
+            player.roundScores.push(total);
+            player.totalScore += total;
+            player.fame += Math.floor(total / 2);
+
+            // Reset boss state
+            gameState.bossActive = false;
+            gameState.currentBoss = null;
+            gameState.judgeBonus = 0;
+        }
+
+        function nextTurn() {
+            gameState.currentPlayerIndex++;
+
+            if (gameState.currentPlayerIndex >= gameState.players.length) {
+                // End of round, show results
+                showRoundResults();
+            } else {
+                startPlayerTurn();
+            }
+        }
+
+        function showRoundResults() {
+            showScreen('round-results');
+
+            const scoreboard = document.getElementById('round-scoreboard');
+            const sortedPlayers = [...gameState.players].sort((a, b) => b.totalScore - a.totalScore);
+
+            scoreboard.innerHTML = sortedPlayers.map((player, index) => {
+                const tier = TIERS.filter(t => player.fame >= t.fame).pop();
+                const roundScore = player.roundScores[gameState.currentRound - 1] || 0;
+
+                return `
+                    <div class="scoreboard-row">
+                        <div class="player-rank">#${index + 1}</div>
+                        <div class="player-info">
+                            <div><strong>${player.name}</strong></div>
+                            <div class="player-fame">Fame: ${player.fame} | Round Score: ${roundScore}</div>
+                        </div>
+                        <div class="player-tier ${tier.class}">${tier.name}</div>
+                        <div style="font-size: 1.5em; font-weight: bold;">${player.totalScore}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function nextRound() {
+            gameState.currentRound++;
+            gameState.currentPlayerIndex = 0;
+
+            if (gameState.currentRound > gameState.totalRounds) {
+                showVictoryScreen();
+            } else {
+                startRound();
+            }
+        }
+
+        // ==================== BOSS BATTLE ====================
+
+        function showBossIntro(boss) {
+            gameState.currentBoss = boss;
+            gameState.bossActive = true;
+
+            showScreen('boss-screen');
+
+            document.getElementById('boss-portrait').textContent = boss.icon;
+            document.getElementById('boss-name').textContent = boss.name;
+            document.getElementById('boss-title').textContent = boss.title;
+            document.getElementById('boss-description').textContent = boss.description;
+            document.getElementById('boss-skill-name').textContent = boss.skillName;
+            document.getElementById('boss-skill-desc').textContent = boss.skillDesc;
+        }
+
+        function startBossBattle() {
+            showScreen('game-screen');
+            updatePhaseIndicator();
+            showIngredientPhase();
+        }
+
+        // ==================== VICTORY ====================
+
+        function showVictoryScreen() {
+            showScreen('victory-screen');
+
+            const sortedPlayers = [...gameState.players].sort((a, b) => b.totalScore - a.totalScore);
+            const winner = sortedPlayers[0];
+
+            document.getElementById('winner-name').textContent = winner.name;
+
+            const standings = document.getElementById('final-standings');
+            standings.innerHTML = sortedPlayers.map((player, index) => {
+                const tier = TIERS.filter(t => player.fame >= t.fame).pop();
+                const medals = ['🥇', '🥈', '🥉', ''];
+
+                return `
+                    <div class="scoreboard-row ${index === 0 ? 'current' : ''}">
+                        <div class="player-rank">${medals[index] || (index + 1)}</div>
+                        <div class="player-info">
+                            <div><strong>${player.name}</strong></div>
+                            <div class="player-fame">Fame: ${player.fame}</div>
+                        </div>
+                        <div class="player-tier ${tier.class}">${tier.name}</div>
+                        <div style="font-size: 1.5em; font-weight: bold;">${player.totalScore}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== TIMER ====================
+
+        function startTimer(seconds, callback) {
+            gameState.timeRemaining = seconds;
+            updateTimerDisplay();
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeRemaining--;
+                updateTimerDisplay();
+
+                if (gameState.timeRemaining <= 0) {
+                    stopTimer();
+                    callback();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('timer');
+            timerEl.textContent = gameState.timeRemaining;
+
+            if (gameState.timeRemaining <= 10) {
+                timerEl.style.color = '#ff6b6b';
+                timerEl.classList.add('pulse');
+            } else {
+                timerEl.style.color = '#ffd700';
+                timerEl.classList.remove('pulse');
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+
+        // Set default player count
+        document.addEventListener('DOMContentLoaded', () => {
+            setPlayerCount(2);
+            document.querySelector('.player-count-btn').classList.add('selected');
+        });
+    </script>
+</body>
+</html>
