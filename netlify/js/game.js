@@ -45,7 +45,20 @@ function startGame() {
 function startRound() {
     showScreen('game-screen');
     document.getElementById('current-round').textContent = gameState.currentRound;
+
+    // 라운드 주제 표시
+    updateRoundTheme();
+
     startPlayerTurn();
+}
+
+function updateRoundTheme() {
+    const roundTheme = ROUND_THEMES.find(t => t.round === gameState.currentRound);
+    if (roundTheme) {
+        document.getElementById('round-theme-icon').textContent = roundTheme.icon;
+        document.getElementById('round-theme-name').textContent = roundTheme.name;
+        document.getElementById('round-theme-desc').textContent = roundTheme.desc;
+    }
 }
 
 function startPlayerTurn() {
@@ -437,26 +450,59 @@ function confirmPlating() {
 // ==================== 심사 ====================
 
 function showJudgingScreen() {
+    // 먼저 심사 화면 요소들 초기화
+    resetJudgingScreen();
+
     showScreen('judging-screen');
 
+    const player = getCurrentPlayer();
     const slots = gameState.selectedIngredients;
-    const synergy = calculateSynergy(slots.main.id, slots.sub1.id, slots.sub2.id);
-    const platingHarmony = Math.min(100, 50 + gameState.decorations.length * 10);
 
-    let themeMatch = 50;
+    // 플레이어 이름 표시
+    document.getElementById('judging-player-name').textContent = `${player.name}의 요리`;
+    document.getElementById('final-dish-emoji').textContent = slots.main?.icon || '🍽️';
+
+    // 시너지 계산
+    const synergy = calculateSynergy(slots.main.id, slots.sub1.id, slots.sub2.id);
+
+    // 플레이팅 점수 계산 (장식 반영 강화)
+    const decoCount = gameState.decorations.length;
+    const platingBase = 40;
+    const decoBonus = Math.min(40, decoCount * 8);  // 장식당 8점, 최대 40점
+    const platingHarmony = platingBase + decoBonus;
+
+    // 플레이팅 테마 매칭 점수 (강화)
+    let themeMatch = 30;
+    let themeBonus = 0;
     if (gameState.selectedTheme) {
         const theme = SERVER_THEMES.find(t => t.id === gameState.selectedTheme);
         if (theme) {
             const selectedIds = [slots.main.id, slots.sub1.id, slots.sub2.id];
             const matches = selectedIds.filter(id => theme.matchIngredients.includes(id)).length;
-            themeMatch = 50 + matches * 15;
+            themeMatch = 30 + matches * 20;  // 재료 매칭당 20점
+            themeBonus = matches * 20;
         }
     }
 
+    // 라운드 주제 보너스 계산
+    const roundTheme = ROUND_THEMES.find(t => t.round === gameState.currentRound);
+    let roundThemeBonus = 0;
+    let roundThemeMatches = 0;
+    if (roundTheme) {
+        const selectedIds = [slots.main.id, slots.sub1.id, slots.sub2.id];
+        roundThemeMatches = selectedIds.filter(id => roundTheme.matchIngredients.includes(id)).length;
+        roundThemeBonus = roundThemeMatches * 15;  // 라운드 주제 재료 매칭당 15점
+    }
+
+    // 심사위원 점수 계산
     const judgeAScore = Math.round((gameState.cookingScore * 0.5) + (synergy * 0.3) + (gameState.cookingScore * 0.2));
     const judgeBScore = Math.round((platingHarmony * 0.4) + (themeMatch * 0.4) + (synergy * 0.2));
-    const totalScore = judgeAScore + judgeBScore;
 
+    // 기본 총점 + 라운드 주제 보너스
+    const baseTotal = judgeAScore + judgeBScore;
+    const totalScore = baseTotal + roundThemeBonus;
+
+    // 보스전 처리
     let bossScore = null, bossDefeated = false;
     if (gameState.bossActive && gameState.currentBoss) {
         bossScore = 120 + Math.floor(Math.random() * 30);
@@ -464,40 +510,80 @@ function showJudgingScreen() {
         if (bossDefeated) gameState.defeatedBosses.push(gameState.currentBoss.id);
     }
 
-    getCurrentPlayer().addRoundScore(totalScore);
+    // 플레이어 점수 저장
+    player.addRoundScore(totalScore);
 
-    document.getElementById('final-dish-emoji').textContent = slots.main?.icon || '🍽️';
-
+    // 심사평 가져오기
     const judgeAComment = getJudgeComment('A', judgeAScore);
     const judgeBComment = getJudgeComment('B', judgeBScore);
 
+    // 심사위원 A 점수 표시 (500ms 후)
     setTimeout(() => {
         document.getElementById('judge-a-score').textContent = judgeAScore;
         document.getElementById('judge-a-breakdown').innerHTML = `
             <div class="judge-comment">"${judgeAComment}"</div>
-            <div><span>조리:</span><span>${Math.round(gameState.cookingScore * 0.5)}</span></div>
-            <div><span>시너지:</span><span>${Math.round(synergy * 0.3)}</span></div>
-            <div><span>대처:</span><span>${Math.round(gameState.cookingScore * 0.2)}</span></div>
+            <div><span>조리 기술:</span><span>${Math.round(gameState.cookingScore * 0.5)}</span></div>
+            <div><span>재료 시너지:</span><span>${Math.round(synergy * 0.3)}</span></div>
+            <div><span>상황 대처:</span><span>${Math.round(gameState.cookingScore * 0.2)}</span></div>
         `;
     }, 500);
 
+    // 심사위원 B 점수 표시 (1000ms 후)
     setTimeout(() => {
         document.getElementById('judge-b-score').textContent = judgeBScore;
         document.getElementById('judge-b-breakdown').innerHTML = `
             <div class="judge-comment">"${judgeBComment}"</div>
             <div><span>플레이팅:</span><span>${Math.round(platingHarmony * 0.4)}</span></div>
-            <div><span>테마:</span><span>${Math.round(themeMatch * 0.4)}</span></div>
-            <div><span>시너지:</span><span>${Math.round(synergy * 0.2)}</span></div>
+            <div><span>테마 매칭:</span><span>${Math.round(themeMatch * 0.4)}</span></div>
+            <div><span>전체 조화:</span><span>${Math.round(synergy * 0.2)}</span></div>
         `;
     }, 1000);
 
+    // 총점 표시 (1500ms 후)
     setTimeout(() => {
         let scoreText = totalScore.toString();
+
+        // 보스전 결과
         if (bossScore !== null) {
-            scoreText = bossDefeated ? `${totalScore} - 승리! (보스: ${bossScore})` : `${totalScore} - 패배... (보스: ${bossScore})`;
+            if (bossDefeated) {
+                scoreText = totalScore + ' 🏆';
+            } else {
+                scoreText = totalScore + ' 💔';
+            }
         }
+
         document.getElementById('total-score').textContent = scoreText;
+
+        // 보너스 정보 표시
+        let bonusHTML = '';
+        if (roundThemeBonus > 0) {
+            bonusHTML += `<div class="theme-bonus">🎯 라운드 주제 보너스: +${roundThemeBonus}</div>`;
+        }
+        if (decoBonus > 0) {
+            bonusHTML += `<div class="deco-bonus">✨ 장식 보너스: +${decoBonus}</div>`;
+        }
+        if (themeBonus > 0) {
+            bonusHTML += `<div class="theme-bonus">🎨 테마 매칭: +${themeBonus}</div>`;
+        }
+        if (bossScore !== null) {
+            bonusHTML += bossDefeated
+                ? `<div style="color:#4caf50;">⚔️ 보스 점수: ${bossScore} - 승리!</div>`
+                : `<div style="color:#ff6b6b;">⚔️ 보스 점수: ${bossScore} - 패배...</div>`;
+        }
+        document.getElementById('bonus-info').innerHTML = bonusHTML;
     }, 1500);
+}
+
+function resetJudgingScreen() {
+    // 모든 심사 관련 요소 초기화
+    document.getElementById('judging-player-name').textContent = '';
+    document.getElementById('final-dish-emoji').textContent = '🍽️';
+    document.getElementById('judge-a-score').textContent = '--';
+    document.getElementById('judge-b-score').textContent = '--';
+    document.getElementById('judge-a-breakdown').innerHTML = '';
+    document.getElementById('judge-b-breakdown').innerHTML = '';
+    document.getElementById('total-score').textContent = '--';
+    document.getElementById('bonus-info').innerHTML = '';
 }
 
 // ==================== 다음 턴 ====================

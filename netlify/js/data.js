@@ -293,3 +293,39 @@ const JUDGE_COMMENTS = {
         ]
     }
 };
+
+// 라운드별 음식 주제
+const ROUND_THEMES = [
+    {
+        round: 1,
+        name: '가정식의 따뜻함',
+        icon: '🏠',
+        desc: '어머니의 손맛처럼 따뜻하고 정겨운 가정식을 만들어주세요.',
+        matchIngredients: ['pork', 'beef', 'chicken', 'kimchi', 'rice', 'potato', 'onion', 'garlic', 'miso', 'gochujang', 'spinach', 'tofu', 'egg'],
+        bonusMultiplier: 1.2
+    },
+    {
+        round: 2,
+        name: '바다의 향연',
+        icon: '🌊',
+        desc: '신선한 해산물로 바다의 풍미를 표현해주세요.',
+        matchIngredients: ['shrimp', 'oyster', 'salmon', 'squid', 'crab', 'eel', 'tuna', 'octopus', 'clam', 'lobster', 'scallop', 'mackerel', 'seaweed'],
+        bonusMultiplier: 1.3
+    },
+    {
+        round: 3,
+        name: '파이어 퓨전',
+        icon: '🔥',
+        desc: '불의 힘으로 강렬하고 자극적인 요리를 선보여주세요.',
+        matchIngredients: ['gochujang', 'chili', 'bacon', 'beef', 'duck', 'lamb', 'curry', 'wasabi', 'pepper', 'ginger'],
+        bonusMultiplier: 1.4
+    },
+    {
+        round: 4,
+        name: '셰프의 특선',
+        icon: '👨‍🍳',
+        desc: '최고급 재료로 당신만의 시그니처 요리를 완성하세요.',
+        matchIngredients: ['lobster', 'salmon', 'crab', 'beef', 'duck', 'truffle', 'parmesan', 'cream', 'butter', 'asparagus', 'scallop', 'foiegras'],
+        bonusMultiplier: 1.5
+    }
+];

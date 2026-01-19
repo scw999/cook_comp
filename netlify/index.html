@@ -40,6 +40,15 @@
                 <div class="timer" id="timer">60</div>
             </div>
 
+            <!-- 라운드 주제 표시 -->
+            <div class="round-theme-banner" id="round-theme-banner">
+                <span class="theme-icon" id="round-theme-icon">🏠</span>
+                <div class="theme-info">
+                    <div class="theme-name" id="round-theme-name">가정식의 따뜻함</div>
+                    <div class="theme-desc" id="round-theme-desc">어머니의 손맛처럼 따뜻한 가정식</div>
+                </div>
+            </div>
+
             <div class="phase-indicator">
                 <div class="phase" id="phase-1">1. 재료 선택</div>
                 <div class="phase" id="phase-2">2. 조리</div>
@@ -59,6 +68,7 @@
         <!-- 심사 화면 -->
         <div id="judging-screen" class="screen">
             <h2 class="section-title">심사 결과</h2>
+            <div class="judging-player-name" id="judging-player-name">플레이어 1</div>
 
             <div id="dish-presentation">
                 <div class="final-dish-emoji" id="final-dish-emoji">🍽️</div>
@@ -73,6 +83,12 @@
                     <div class="score-breakdown" id="judge-a-breakdown"></div>
                 </div>
 
+                <div class="total-score-container">
+                    <div class="total-score-label">총점</div>
+                    <div class="total-score-value" id="total-score">--</div>
+                    <div class="bonus-info" id="bonus-info"></div>
+                </div>
+
                 <div class="judge-card">
                     <div class="judge-avatar">👩‍🍳</div>
                     <div class="judge-name">심사위원 B</div>
@@ -82,10 +98,8 @@
                 </div>
             </div>
 
-            <div class="final-score" id="total-score">--</div>
-
             <div class="center-buttons">
-                <button class="btn btn-primary" onclick="nextTurn()">다음</button>
+                <button class="btn btn-primary" id="next-turn-btn" onclick="nextTurn()">다음</button>
             </div>
         </div>
 
