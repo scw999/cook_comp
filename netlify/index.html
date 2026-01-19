@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>고메 워즈: 미식의 계단</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 메인 메뉴 -->
+        <div id="main-menu" class="screen active">
+            <div class="main-title">
+                <h1>고메 워즈</h1>
+                <h2>미식의 계단</h2>
+                <p class="subtitle">Gourmet Wars: Steps of Taste</p>
+            </div>
+
+            <div class="player-setup">
+                <h3 class="section-title">플레이어 수 선택</h3>
+                <div class="player-count-selector">
+                    <button class="player-count-btn" onclick="setPlayerCount(2)">2</button>
+                    <button class="player-count-btn" onclick="setPlayerCount(3)">3</button>
+                    <button class="player-count-btn" onclick="setPlayerCount(4)">4</button>
+                </div>
+
+                <div id="player-names" class="player-names"></div>
+
+                <div class="center-buttons">
+                    <button class="btn btn-primary" onclick="startGame()">게임 시작</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="round-info">라운드 <span id="current-round">1</span> / <span id="total-rounds">4</span></div>
+                <div class="current-player" id="current-player-display">플레이어 1의 차례</div>
+                <div class="timer" id="timer">60</div>
+            </div>
+
+            <div class="phase-indicator">
+                <div class="phase" id="phase-1">1. 재료 선택</div>
+                <div class="phase" id="phase-2">2. 조리</div>
+                <div class="phase" id="phase-3">3. 플레이팅</div>
+            </div>
+
+            <!-- 재료 선택 페이즈 -->
+            <div id="ingredient-phase" class="game-phase"></div>
+
+            <!-- 조리 페이즈 -->
+            <div id="cooking-phase" class="game-phase" style="display: none;"></div>
+
+            <!-- 플레이팅 페이즈 -->
+            <div id="plating-phase" class="game-phase" style="display: none;"></div>
+        </div>
+
+        <!-- 심사 화면 -->
+        <div id="judging-screen" class="screen">
+            <h2 class="section-title">심사 결과</h2>
+
+            <div id="dish-presentation">
+                <div class="final-dish-emoji" id="final-dish-emoji">🍽️</div>
+            </div>
+
+            <div class="judges-panel">
+                <div class="judge-card">
+                    <div class="judge-avatar">👨‍🍳</div>
+                    <div class="judge-name">심사위원 A</div>
+                    <div class="judge-type">냉철한 분석가</div>
+                    <div class="judge-score" id="judge-a-score">--</div>
+                    <div class="score-breakdown" id="judge-a-breakdown"></div>
+                </div>
+
+                <div class="judge-card">
+                    <div class="judge-avatar">👩‍🍳</div>
+                    <div class="judge-name">심사위원 B</div>
+                    <div class="judge-type">감성 미식가</div>
+                    <div class="judge-score" id="judge-b-score">--</div>
+                    <div class="score-breakdown" id="judge-b-breakdown"></div>
+                </div>
+            </div>
+
+            <div class="final-score" id="total-score">--</div>
+
+            <div class="center-buttons">
+                <button class="btn btn-primary" onclick="nextTurn()">다음</button>
+            </div>
+        </div>
+
+        <!-- 라운드 결과 -->
+        <div id="round-results" class="screen">
+            <h2 class="section-title">라운드 결과</h2>
+            <div class="scoreboard" id="round-scoreboard"></div>
+            <div class="center-buttons">
+                <button class="btn btn-primary" onclick="nextRound()">다음 라운드</button>
+            </div>
+        </div>
+
+        <!-- 보스 화면 -->
+        <div id="boss-screen" class="screen">
+            <div class="boss-intro">
+                <div class="boss-alert">⚔️ 보스 등장! ⚔️</div>
+                <div class="boss-portrait" id="boss-portrait">👨‍🍳</div>
+                <div class="boss-name" id="boss-name">보스 이름</div>
+                <div class="boss-title" id="boss-title">보스 칭호</div>
+                <div class="boss-description" id="boss-description">보스 설명</div>
+                <div class="boss-skill">
+                    <h4>🎯 특수 스킬: <span id="boss-skill-name">스킬명</span></h4>
+                    <p id="boss-skill-desc">스킬 설명</p>
+                </div>
+                <div class="center-buttons">
+                    <button class="btn btn-primary" onclick="startBossBattle()">도전하기!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 승리 화면 -->
+        <div id="victory-screen" class="screen">
+            <div class="victory-screen">
+                <div class="trophy">🏆</div>
+                <div class="victory-title">우승자</div>
+                <div class="winner-name" id="winner-name">플레이어 이름</div>
+                <div class="winner-subtitle">미식의 계단을 오르다</div>
+                <div class="scoreboard" id="final-standings"></div>
+                <div class="center-buttons">
+                    <button class="btn btn-primary" onclick="location.reload()">다시 플레이</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 이벤트 팝업 -->
+        <div id="event-overlay" class="overlay" style="display: none;"></div>
+        <div id="event-popup" class="event-popup" style="display: none;">
+            <div class="event-icon" id="event-icon">🎲</div>
+            <h3 class="event-title" id="event-title">이벤트!</h3>
+            <p id="event-description">이벤트 설명</p>
+            <button class="btn btn-primary" onclick="closeEvent()">확인</button>
+        </div>
+    </div>
+
+    <!-- JavaScript 파일들 -->
+    <script src="js/data.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/minigames.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
